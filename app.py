@@ -3,7 +3,6 @@ import numpy as np
 import torch
 from src.chatterbox.mtl_tts import ChatterboxMultilingualTTS, SUPPORTED_LANGUAGES
 import gradio as gr
-import spaces
 from sentence_splitter import SentenceSplitter
 import re
 import uuid
@@ -322,7 +321,6 @@ def generate_single_chunk(text, language_id, audio_prompt_path, exaggeration, te
     return current_model.sr, wav.squeeze(0).numpy()
 
 
-@spaces.GPU
 def generate_tts_audio(
     text_input: str,
     language_id: str,
@@ -509,4 +507,13 @@ with gr.Blocks() as demo:
         outputs=[audio_output],
     )
 
-demo.launch(mcp_server=True)
+import click
+
+@click.command()
+@click.option("--debug", is_flag=True, default=False, help="Enable debug mode.")
+@click.option("--share", is_flag=True, default=False, help="Enable sharing of the interface.")
+def main(debug, share):
+    demo.queue().launch(debug=debug, share=share)
+
+if __name__ == "__main__":
+    main()
